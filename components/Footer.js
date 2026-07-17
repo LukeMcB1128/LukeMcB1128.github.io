@@ -14,13 +14,10 @@ export default function Footer() {
             </p>
           </div>
           <div className="flex space-x-4">
-            <Link href="#" className="text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
-              Twitter
-            </Link>
-            <Link href="#" className="text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
+            <Link href="https://github.com/LukeMcB1128" className="text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
               GitHub
             </Link>
-            <Link href="#" className="text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
+            <Link href="https://www.linkedin.com/in/luke-brittain-b541ab1b9/" className="text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors">
               LinkedIn
             </Link>
           </div>
