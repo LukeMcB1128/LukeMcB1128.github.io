@@ -34,7 +34,7 @@ export default function Home({ posts }) {
 
 export async function getStaticProps() {
   const postsDirectory = path.join(process.cwd(), 'content', 'blog')
-  const fileNames = fs.readdirSync(postsDirectory)
+  const fileNames = fs.readdirSync(postsDirectory).filter((fileName) => fileName.endsWith('.mdx'))
   
   // Read all posts and parse front matter
   const posts = fileNames.map((fileName) => {
