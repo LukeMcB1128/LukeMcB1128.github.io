@@ -46,16 +46,25 @@ export default function Write() {
       return
     }
 
-    const slug = title.toLowerCase().replace(/\s+/g, '-')
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+    if (!slug) {
+      setMessage('Error: title must contain at least one letter or number.')
+      setIsSubmitting(false)
+      return
+    }
     const filePath = `content/blog/${slug}.mdx`
 
-    // Build front‑matter and content
+    // Build front‑matter and content (JSON.stringify quotes/escapes YAML-safe strings)
     const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean)
     const frontMatter = [
       '---',
-      `title: ${title}`,
+      `title: ${JSON.stringify(title)}`,
       `date: ${new Date().toISOString()}`,
-      ...tagsArray.map(tag => `tag: ${tag}`),
+      'tags:',
+      ...tagsArray.map(tag => `  - ${JSON.stringify(tag)}`),
       '---',
       '',
       content

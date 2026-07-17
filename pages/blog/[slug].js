@@ -18,7 +18,7 @@ export default function Post({ post, source }) {
             <span>{post.readingTime} min read</span>
           </div>
           <div className="flex flex-wrap gap-2 mb-6">
-            {post.tags.map((tag) => (
+            {(post.tags || []).map((tag) => (
               <span 
                 key={tag} 
                 className="bg-primary-100 text-primary-800 text-sm font-medium px-3 py-1 rounded dark:bg-primary-900 dark:text-primary-100"
