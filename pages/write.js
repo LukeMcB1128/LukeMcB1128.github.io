@@ -1,9 +1,9 @@
 import Layout from '../components/Layout'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // --- Configuration -------------------------------------------------------
-const REPO_OWNER = 'your-username'   // <-- replace with your GitHub username
-const REPO_NAME = 'blog-repo'        // <-- replace with the repo that hosts this site
+const REPO_OWNER = 'LukeMcB1128'
+const REPO_NAME = 'LukeMcB1128.github.io'
 const GITHUB_BRANCH = 'main'         // branch where posts live
 
 // Encode string to base64 for GitHub API
@@ -17,6 +17,22 @@ export default function Write() {
   const [content, setContent] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  const [hasToken, setHasToken] = useState(false)
+  const [tokenInput, setTokenInput] = useState('')
+  const [checkedToken, setCheckedToken] = useState(false)
+
+  useEffect(() => {
+    setHasToken(Boolean(localStorage.getItem('githubToken')))
+    setCheckedToken(true)
+  }, [])
+
+  const handleSaveToken = (e) => {
+    e.preventDefault()
+    if (!tokenInput.trim()) return
+    localStorage.setItem('githubToken', tokenInput.trim())
+    setTokenInput('')
+    setHasToken(true)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -88,6 +104,28 @@ export default function Write() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (!checkedToken) {
+    return <Layout />
+  }
+
+  if (!hasToken) {
+    return (
+      <Layout>
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Author Access</h1>
+          <p className="text-gray-700 dark:text-gray-300 mb-6">
+            Writing posts requires a GitHub token with push access to this site&apos;s repository.
+            Paste yours below — it is stored only in this browser.
+          </p>
+          <form onSubmit={handleSaveToken} className="flex gap-3">
+            <input type="password" value={tokenInput} onChange={(e)=>setTokenInput(e.target.value)} className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-800 dark:text-white" placeholder="GitHub personal access token"/>
+            <button type="submit" className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">Save</button>
+          </form>
+        </div>
+      </Layout>
+    )
   }
 
   return (

@@ -1,7 +1,14 @@
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import DarkModeToggle from './DarkModeToggle'
 
 export default function Header() {
+  const [canWrite, setCanWrite] = useState(false)
+
+  useEffect(() => {
+    setCanWrite(Boolean(localStorage.getItem('githubToken')))
+  }, [])
+
   return (
     <header className="border-b border-gray-200 dark:border-gray-700">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -15,9 +22,11 @@ export default function Header() {
           <Link href="/blog" className="text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
             Blog
           </Link>
-          <Link href="/write" className="text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
-            Write
-          </Link>
+          {canWrite && (
+            <Link href="/write" className="text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors">
+              Write
+            </Link>
+          )}
           <DarkModeToggle />
         </nav>
       </div>
