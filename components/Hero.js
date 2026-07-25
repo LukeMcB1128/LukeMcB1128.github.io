@@ -10,8 +10,8 @@ export default function Hero() {
 
   return (
     <div className="bg-gradient-to-r from-primary-500 to-primary-700 text-white rounded-xl p-8 mb-12">
-      <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to My Blog</h1>
-      <p className="text-xl mb-6">Sharing thoughts, ideas, and tutorials on web development and more.</p>
+      <h1 className="text-4xl md:text-5xl font-bold mb-4">Welcome to my blog</h1>
+      <p className="text-xl mb-6">Talking about my projects.</p>
       <div className="flex space-x-4">
         <Link
           href="/blog"
