@@ -2,6 +2,7 @@ import Layout from '../../components/Layout'
 import { format } from 'date-fns'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
+import remarkGfm from 'remark-gfm'
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
@@ -59,7 +60,10 @@ export async function getStaticProps({ params }) {
   }
   // Parse MDX content with serialized data
   const source = await serialize(content, {
-    scope: serializedData
+    scope: serializedData,
+    mdxOptions: {
+      remarkPlugins: [remarkGfm]
+    }
   })
 
   return {
