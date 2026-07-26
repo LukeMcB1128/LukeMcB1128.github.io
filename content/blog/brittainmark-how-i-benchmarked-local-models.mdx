@@ -1,0 +1,58 @@
+---
+title: "Brittainmark: How I Benchmarked Local Models"
+date: 2026-07-26T08:46:12.881Z
+tags:
+  - "JavaScript"
+  - "LLM"
+---
+
+# Intro
+As mentioned in my [first post](https://lukemcb1128.github.io/blog/brittain-code-what-i-learned-building-a-coding-agent-for-local-models), to be able to use these models in the Brittain Code system to their best extent I needed to benchmark them. In this post I will get into the methods used to benchmark these models and how it progressed.
+
+***If you want a look at only the reports, they are here: [v2](https://lukemcb1128.github.io/pages/reportv2.html), [v3](https://lukemcb1128.github.io/pages/reportv3.html). 
+
+## Overview
+I started originally with a single task called cart. Cart V1 tested models on simple monetary calculations and was pretty easy. However, this one task was not enough to judge models on a real coding loop. Thus after a while of iteration, I came out with Brittainmark V2 (then called Brittain Code Benchmark V2). 
+
+### Brittainmark V2
+I'm not gonna go super in-depth on V2, as it is quite irrelevant compared to V3. Brittainmark V2 had four tasks and tested seven models. The tasks were: Cart V3, Debug V2, Economy V2, and Feature V2. The model results were pretty interesting here. This is where I really determined we needed more testing. Results can be found [here](https://lukemcb1128.github.io/pages/reportv2.html). 
+
+### Brittainmark V3
+V3 brought a bunch of new features to the benchmark. Two new tasks, a revamped task, automated benchmarking, and capability to test frontier cloud models on the benchmark. Heres a comprehensive breakdown of the tasks:
+
+| Task | What it tests | Why it is interesting |
+|---|---|---|
+| **Cart v4** | Correct monetary calculation, validation, rounding, discounts, tax, shipping, and input immutability. | A compact baseline task: easy to make visible tests pass, harder to correctly handle cents, tax allocation, thresholds, and invalid inputs. |
+| **Feature v3** | Completing an atomic checkout flow across inventory and payment code. | Tests transactional reasoning: validate before mutation, aggregate duplicate SKUs, roll back stock when payment fails, and preserve the original error. |
+| **Debug v3** | Diagnosing a cache whose visible tests pass but production behavior is wrong. | Tests whether a model investigates the underlying abstraction rather than trusting green tests: tenant isolation, exact key identity, falsy values, and seconds-vs-milliseconds TTL logic. |
+| **Economy v3** | A deterministic simulation with RNG state, money conservation, snapshots, and resumable execution. | The longest-horizon state-management task. A successful implementation must make split runs exactly match a continuous run while preserving invariants and avoiding mutation. |
+| **Outbox v2** | A durable retry queue with leases, recovery, exponential backoff, dead letters, and snapshots. | The concurrency/reliability task. It combines ownership, ordering, recovery after worker failure, exactly-timed retry behavior, and defensive copying. |
+| **FraudML v1** | A python fraud-scoring pipeline with deterministic train/validation splitting and threshold calibration. | Shows ML-adjacent reasoning without hiding behind libraries: prevent validation leakage, compute class-specific centroids, choose a threshold by F1, and handle model serialization safely. |
+| **TS API v1** | A TypeScript API client and directory sync layer. | Tests realistic integration logic: typed HTTP failures, 429 handling, ETags/304 responses, cursor pagination, cache reuse, idempotency, input validation, and detached results. |
+
+The best way to describe these would be:
++ **Cart** is correctness for everyday business rules
++ **Feature** is transcational feature implementation
++ **Debug** is diagnosing past green tests
++ **Economy** is determinstic reasoning over time
++ **Outbox** is production reliability and recovery
++ **FraudML** is data/machine learning pipeline reasoning
++ **TS API** is API contract and integration reasoning
+
+After completely finishing benchmarking it registered 112 total runs across 16 models. 3 of these models are cloud models, Claude Haiku 4.5 and Sonnet 4.5, GPT-4o from OpenAI. These cloud models were used to give a relative standpoint of how these local models stack up against what you get by paying, and even those these are old models the local models match up pretty decently. 
+
+The results show an interesting picture, with no model actually passing 100%. The winning model was **Sonnet 4.5**, with an average score of 93.7 and a pass rate of 71%. Our losing model was **Granite4.1:8b** with a zero percent pass rate and an average score of 40.8. This makes sense as Sonnet is estimated to have ~1 trillion parameters, while Granite has 8 billion so much smaller. Next an overview of my picks for best models to use for what.
+
+***Note: obviously frontier models are much better, but these are specifically local models that most people can run, all benchmarking ran on a 36gb RAM M3 Max MacBook Pro***
+
+| **Best Use Case** | **Model** | **Reason** |
+|-------------------|-----------|------------|
+| Speed | gpt-oss:20b | OpenAI smaller local model, gpt-oss produced the best score per minute on Brittainmark. It recorded 71 points per minute, with a total average score of 74.5 and time of 93.9 seconds average. Important note here, gpt-oss had a low score of 0 and a high score of 100, a super high range. It is also a good model for general coding use but can be unpredictable and fail at tasks some times. |
+| Correctness | qwen3.6:27b | A very slow model, average time of 568 seconds (limited by hardware because of dense architecture) but recorded a score of 87.1, only one point behind GPT-4o. A runner up heres if you like the big qwen models is qwen3.6:35b-a3b, a MoE model that didn't bench as well but in practice is faster and performs similarly. |
+| Reliability | glm-4.7-flash:latest(30b) | This came as a surprise for me, as glm typically scores worse, but this model scored an 83.8 with a bound of only 65-97. This is the smallest difference for a local model here. Average time of 353.1 seconds. |
+| Overall | laguna-xs-2.1:latest(33b) | My personal favorite for coding tasks which is shown in the benchmark. Average score of 84.4 which is pretty decent with a bigger difference between high scores but a higher max potential. It seems to lean into its higher scores more often than not with good reasoning. Average time of 231 seconds is pretty fast for output as well. |
+
+You can find the html page for Brittainmark V3 [here](https://lukemcb1128.github.io/pages/reportv3.html). 
+
+Thanks for reading. 
+- Luke Brittain
