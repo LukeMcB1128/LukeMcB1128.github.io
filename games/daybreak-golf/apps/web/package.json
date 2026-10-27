@@ -1,0 +1,19 @@
+{
+  "name": "@golf/web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview:pages": "vite preview --mode pages --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@golf/game": "*"
+  },
+  "devDependencies": {
+    "vite": "^6.0.5"
+  }
+}

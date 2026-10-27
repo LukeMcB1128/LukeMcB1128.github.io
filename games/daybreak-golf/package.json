@@ -1,0 +1,27 @@
+{
+  "name": "daily-golf",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22.13.0", "npm": ">=10" },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c green,cyan \"npm run dev -w @golf/server\" \"npm run dev -w @golf/web\"",
+    "build": "npm run check && npm run build -w @golf/web",
+    "build:pages": "npm run check && npm run build -w @golf/web -- --mode pages",
+    "check:pages": "node scripts/check-pages.mjs",
+    "preview:pages": "npm run preview:pages -w @golf/web",
+    "check": "tsc --noEmit",
+    "start": "npm run start -w @golf/server",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.7.2"
+  }
+}
