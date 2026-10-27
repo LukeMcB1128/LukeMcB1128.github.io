@@ -1,7 +1,11 @@
+# Install this workflow as .github/workflows/deploy.yml in LukeMcB1128.github.io.
+# Keep this game source under games/daybreak-golf in that repository.
 name: Deploy to GitHub Pages
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
@@ -21,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node for blog
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -30,8 +34,32 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build blog
         run: npm run build
+
+      - name: Setup Node for Daybreak Golf
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: games/daybreak-golf/package-lock.json
+
+      - name: Install Daybreak Golf dependencies
+        run: npm ci --prefix games/daybreak-golf
+
+      - name: Test Daybreak Golf
+        run: npm --prefix games/daybreak-golf test
+
+      - name: Build Daybreak Golf for Pages
+        run: npm --prefix games/daybreak-golf run build:pages
+
+      - name: Check Daybreak Golf assets
+        run: npm --prefix games/daybreak-golf run check:pages
+
+      - name: Add Daybreak Golf to the site output
+        run: |
+          mkdir -p out/daybreak-golf
+          cp -R games/daybreak-golf/apps/web/dist/. out/daybreak-golf/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -39,6 +67,7 @@ jobs:
           path: out
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:
